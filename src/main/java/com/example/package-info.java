@@ -28,24 +28,42 @@
  *  Phantom Read - repeatable read data and getting different data that not need
  *
  * isolation levels        Dirty Read   | Non-Repeatable Read | Phantom Read
- * Read Uncommitted        |     Yes    |         Yes         |      Yes             consistency high
- * Read Committed          |     No     |         Yes         |      Yes                  ^
- * Repeatable Read         |     No     |         No          |      Yes                  |
- * Serializable            |     No     |         No          |      No               consistency low
+ * Read Uncommitted        |     Yes    |         Yes         |      Yes             consistency high                use only when only reads                   optimistic concurrency control
+ * Read Committed          |     No     |         Yes         |      Yes                  ^                                                                     optimistic concurrency control
+ * Repeatable Read         |     No     |         No          |      Yes                  |                                                                    pessimistic concurrency control
+ * Serializable            |     No     |         No          |      No               consistency low                                                           pessimistic concurrency control
  *
  * Isolation levels        Locking strategy
  *
  * Read uncommitted        |  No locks for read and write
  * Read committed          |  Read : shared lock required and Release as soon as read is done and Write : exclusive lock required and keep till end transaction
- * Repeatable read         |  Shared lock for read and exclusive lock for write
- * Serializable            |  Shared lock for read and exclusive lock for write
+ * Repeatable read         |  Read : shared lock required and Release at end transaction and Write : exclusive lock required and release at end of transaction
+ * Serializable            |  Same as Repeatable read locking strategy and apply range lock and lock is release at end of transaction
  *
- *
- *
+ * In PostgresSQL, @Transactional--> the locking behavior of default--> Read Committed
  *
  * concurrent database operations
  * prevent concurrent updates unless the data is unchanged.
  * optimistic and pessimistic --> expected frequency of data conflicts and the need for data consistency versus system performance.
+ *
+ *  optimistic concurrency control OCC -->
+ *   1.Isolation Level used Below Repeatable Read
+ *   2.Higher concurrency
+ *   3.No chance Deadlock
+ *   4.In case of conflict, rollback the transaction and retry logic is there
+ *
+ *   pessimistic concurrency control PCC-->
+ *   1.Isolation Level used Repeatable Read and Serializable
+ *   2.Lower concurrency
+ *   3.Chance of Deadlock and need force rollback
+ *   4.Putting long lock,sometimes timeout issue comes and need to be done
+ *
+ *
+ *  in PCC --> either tx1 or tx2 completed and other waited but problem is deadlock
+ *
+ *
+ *
+ *
  */
 
 
